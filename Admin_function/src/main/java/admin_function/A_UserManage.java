@@ -2,14 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package deu.cse.admin_function;
+package admin_function;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+
 
 /**
  *
@@ -24,33 +28,35 @@ public class A_UserManage extends javax.swing.JFrame {
         initComponents();
         setTitle("사용자 관리");
         setLocationRelativeTo(null);
-        setSize(700,800);
+        setSize(700, 800);
         setDefaultCloseOperation(Admin_FirstPage.EXIT_ON_CLOSE);
         ShowUserInfo();
+
     }
 
-    private void ShowUserInfo() { 
+    private void ShowUserInfo() {
         File file = new File("C:/Users/원채연/Desktop/SWproject/Software_Project/UserList.txt");
+                DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
             String temp;
             while ((temp = br.readLine()) != null) {
-                String[] dataRow = temp.split("|");
+                String[] dataRow = temp.split("\\|");
+                
                 String[] input = new String[6];
                 input[0] = dataRow[0];
                 input[1] = dataRow[1];
                 input[2] = dataRow[4];
                 input[3] = dataRow[5];
-
+                System.out.println(Arrays.toString(dataRow)); 
                 model.addRow(input);
             }
-
-        } catch (Exception ex) {
-            ex.getStackTrace();
-        }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }    
     }
     
-    
+   
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -118,6 +124,11 @@ public class A_UserManage extends javax.swing.JFrame {
         buylist_butt1.setFont(new java.awt.Font("맑은 고딕", 0, 18)); // NOI18N
         buylist_butt1.setText("구매내역");
         buylist_butt1.setActionCommand("구내매역");
+        buylist_butt1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buylist_butt1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -147,7 +158,7 @@ public class A_UserManage extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(out_butt, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(buylist_butt1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 99, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(back_butt, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(16, 16, 16))
         );
@@ -169,28 +180,32 @@ public class A_UserManage extends javax.swing.JFrame {
 
     private void out_buttActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_out_buttActionPerformed
         // TODO add your handling code here:
-        DefaultTableModel tblmodel = (DefaultTableModel)jTable1.getModel();
-        if(jTable1.getSelectedRowCount() == 1){ //성공적으로 탈퇴
-            tblmodel.removeRow(jTable1.getSelectedRow());
+        DefaultTableModel tblmodel = (DefaultTableModel) jTable1.getModel();
+        if (jTable1.getSelectedRowCount() == 1) { //성공적으로 탈퇴
+            DeleteData dd = new DeleteData();
+            File file = new File("C:/Users/원채연/Desktop/SWproject/Software_Project/UserList.txt");
+            dd.deleteData(jTable1.getSelectedRow(),file);   //txt파일에서 회원정보 삭제
+            JOptionPane.showMessageDialog(this, "해당 회원이 탈퇴되었습니다.");         
+            tblmodel.removeRow(jTable1.getSelectedRow());   //table에서 지우기
             
-        }else{
-            if(jTable1.getSelectedRowCount() == 0){ //아무도 선택하지 않은 경우
-                    JOptionPane.showMessageDialog(this, "탈퇴시킬 회원을 선택하세요");
+        } else {
+            if (jTable1.getSelectedRowCount() == 0) { //아무도 선택하지 않은 경우
+                JOptionPane.showMessageDialog(this, "탈퇴시킬 회원을 선택하세요");
+            } else {   //2명 이상 선택한 경우
+                JOptionPane.showMessageDialog(this, "한명의 회원을 선택하세요");
             }
-            else{   //2명 이상 선택한 경우
-                    JOptionPane.showMessageDialog(this, "한명의 회원을 선택하세요");
-            }
-        
         }
-                
     }//GEN-LAST:event_out_buttActionPerformed
 
-    
-    
-    
+    private void buylist_butt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buylist_butt1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buylist_butt1ActionPerformed
+
+
     /**
      * @param args the command line arguments
-     */    public static void main(String args[]) {
+     */
+    public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.

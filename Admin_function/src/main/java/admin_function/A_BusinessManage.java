@@ -2,7 +2,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package deu.cse.admin_function;
+package admin_function;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -17,9 +26,32 @@ public class A_BusinessManage extends javax.swing.JFrame {
         initComponents();
         setTitle("사업자 관리");
         setLocationRelativeTo(null);
-        setSize(700,800);
+        setSize(700, 800);
         setDefaultCloseOperation(Admin_FirstPage.EXIT_ON_CLOSE);
     }
+
+    private void ShowBusinInfo() {
+        File file = new File("C:/Users/원채연/Desktop/SWproject/Software_Project/BusinessList.txt");
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
+            String temp;
+            while ((temp = br.readLine()) != null) {
+                String[] dataRow = temp.split("\\|");
+                
+                String[] input = new String[6];
+                input[0] = dataRow[0];
+                input[1] = dataRow[1];
+                input[2] = dataRow[4];
+                input[3] = dataRow[5];
+                input[4] = dataRow[2];
+                System.out.println(Arrays.toString(dataRow)); 
+                model.addRow(input);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }    
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -40,17 +72,17 @@ public class A_BusinessManage extends javax.swing.JFrame {
         jTable1.setFont(new java.awt.Font("맑은 고딕", 0, 18)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "유저네임", "이름", "생년월일", "전화번호"
+                "유저넘버", "이름", "상호명", "사업자번호", "전화번호"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -64,10 +96,16 @@ public class A_BusinessManage extends javax.swing.JFrame {
             jTable1.getColumnModel().getColumn(1).setResizable(false);
             jTable1.getColumnModel().getColumn(2).setResizable(false);
             jTable1.getColumnModel().getColumn(3).setResizable(false);
+            jTable1.getColumnModel().getColumn(4).setResizable(false);
         }
 
         out_butt.setFont(new java.awt.Font("맑은 고딕", 0, 18)); // NOI18N
         out_butt.setText("탈퇴");
+        out_butt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                out_buttActionPerformed(evt);
+            }
+        });
 
         back_butt.setText("뒤로가기");
         back_butt.addActionListener(new java.awt.event.ActionListener() {
@@ -115,6 +153,27 @@ public class A_BusinessManage extends javax.swing.JFrame {
         dispose();
 
     }//GEN-LAST:event_back_buttActionPerformed
+
+    private void out_buttActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_out_buttActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel tblmodel = (DefaultTableModel) jTable1.getModel();
+        File file = new File("C:/Users/원채연/Desktop/SWproject/Software_Project/BusinessList.txt");
+
+        if (jTable1.getSelectedRowCount() == 1) { //성공적으로 탈퇴
+            DeleteData dd = new DeleteData();
+            dd.deleteData(jTable1.getSelectedRow(),file);
+                JOptionPane.showMessageDialog(this, "해당 회원이 탈퇴되었습니다.");            
+            tblmodel.removeRow(jTable1.getSelectedRow());
+            
+        } else {
+            if (jTable1.getSelectedRowCount() == 0) { //아무도 선택하지 않은 경우
+                JOptionPane.showMessageDialog(this, "탈퇴시킬 회원을 선택하세요");
+            } else {   //2명 이상 선택한 경우
+                JOptionPane.showMessageDialog(this, "한명의 회원을 선택하세요");
+            }
+        }
+
+    }//GEN-LAST:event_out_buttActionPerformed
 
     /**
      * @param args the command line arguments
